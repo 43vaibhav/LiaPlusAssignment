@@ -2,7 +2,7 @@
 
 **Assignment:** Conversational AI with Sentiment Analysis (Tier 1 & Tier 2 Implementation)
 
-A production-grade Python chatbot that maintains full conversation history, performs real-time sentiment analysis on individual user messages, and generates comprehensive emotional journey summaries. Built with **Google Gemini** for intelligent responses and **VADER** for accurate sentiment evaluation.
+A production-grade Python chatbot that maintains full conversation history, performs real-time sentiment analysis on individual user messages, and generates comprehensive emotional journey summaries. Built with **Google Gemini** for intelligent responses and **VADER** for accurate sentiment evaluation. This version adds a small web UI and a FastAPI HTTP endpoint so the bot can be used from a browser or programmatically.
 
 ---
 
@@ -80,9 +80,26 @@ GEMINI_API_KEY=your_api_key_here
 
 ### 4. Run the Chatbot
 
+There are two ways to run the project:
+
+1) Run as a console application (present in `chatbot.py`):
+
 ```bash
 python chatbot.py
 ```
+
+2) Run as a web service (recommended for the web UI):
+
+Install the web dependencies and start `uvicorn` to serve the FastAPI app in `chatbot.py`.
+
+```bash
+# start the FastAPI app (development mode with autoreload)
+uvicorn chatbot:app --reload --host 127.0.0.1 --port 8000
+```
+
+The FastAPI app exposes a POST `/chat` endpoint which accepts JSON `{"text":"..."}` and returns a JSON reply including sentiment, score, and whether the conversation ended.
+
+The repository also includes a simple `index.html` in the project root that demonstrates how to call the `/chat` endpoint from a browser.
 
 ---
 
@@ -139,6 +156,8 @@ Take care! Come back anytime 💙
 | **Python 3.8+** | Core language | Simplicity, readability, industry standard for NLP |
 | **Google Gemini API** | AI responses | Free tier available, state-of-the-art language model |
 | **VADER** | Sentiment analysis | Specialized for social media/conversational text, fast, accurate |
+| **FastAPI** | HTTP server & web UI backend | Lightweight, high-performance ASGI framework used to expose `/chat` endpoint |
+| **uvicorn** | ASGI server | Fast, standard runner for FastAPI during development |
 | **python-dotenv** | Config management | Secure API key handling, environment isolation |
 | **unittest** | Testing | Built-in, no external dependencies, industry standard |
 
@@ -265,14 +284,24 @@ system_instruction="You are a warm, empathetic, and caring support assistant. "
 | `404 Model not found` | Update `MODEL_NAME` to valid Gemini model |
 | `Rate limit exceeded` | Wait before next request or upgrade API plan |
 | Incorrect sentiment score | VADER works best with standard English; avoid excessive misspellings |
+| `ModuleNotFoundError: fastapi` or `uvicorn` | Install the web dependencies from `requirements.txt` or run `pip install fastapi uvicorn` |
 
 ---
 
 ## Dependencies
 
+This project can run as a console app or a small web service. The dependencies below include the web stack used by the FastAPI-based UI.
+
 - **google-generativeai** ≥ 0.8.0 — Gemini API client
 - **vaderSentiment** ≥ 3.3.2 — Sentiment analysis
 - **python-dotenv** ≥ 1.0.0 — Environment variable management
+- **fastapi** ≥ 0.95.0 — Web framework for the `/chat` endpoint
+- **uvicorn** ≥ 0.22.0 — ASGI server to run FastAPI
+
+Install all:
+```bash
+pip install -r requirements.txt
+```
 
 Install all:
 ```bash
