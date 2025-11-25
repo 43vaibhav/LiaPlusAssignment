@@ -44,7 +44,7 @@ A production-grade Python chatbot that maintains full conversation history, perf
 
 **Clone/Set Up the Project:**
 ```bash
-cd Chatbot1
+cd Bot
 ```
 
 **Create Virtual Environment (Windows PowerShell):**
@@ -329,3 +329,4 @@ This project is open-source and available for educational and personal use.
 ---
 
 **Built with ❤️ | Gemini + VADER + Python**
+
