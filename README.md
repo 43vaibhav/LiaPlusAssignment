@@ -165,7 +165,7 @@ Take care! Come back anytime 💙
 
 ## Sentiment Analysis Logic
 
-### VADER (Valence Aware Dictionary and sEntiment Reasoner)
+### VADER (Valence Aware Dictionary and Sentiment Reasoner)
 
 **Why VADER?**
 - Designed for social media and conversational text (perfect for chatbot messages)
@@ -329,4 +329,5 @@ This project is open-source and available for educational and personal use.
 ---
 
 **Built with ❤️ | Gemini + VADER + Python**
+
 
