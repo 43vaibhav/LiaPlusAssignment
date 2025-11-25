@@ -1,115 +1,117 @@
-# Gemini + Emotional Intelligence Chatbot
+# Emotional Intelligence Chatbot
 
-A conversational AI chatbot that combines **Google Gemini** for natural language processing with **VADER sentiment analysis** to track and understand emotional patterns in conversations.
+**Assignment:** Conversational AI with Sentiment Analysis (Tier 1 & Tier 2 Implementation)
 
-## Features
+A production-grade Python chatbot that maintains full conversation history, performs real-time sentiment analysis on individual user messages, and generates comprehensive emotional journey summaries. Built with **Google Gemini** for intelligent responses and **VADER** for accurate sentiment evaluation.
 
-- 🤖 **AI-Powered Responses**: Uses Google's Gemini 2.5 Flash Lite model for empathetic, context-aware replies
-- 💭 **Real-time Sentiment Analysis**: VADER sentiment analyzer provides instant emotional feedback on user messages
-- 📊 **Mood Journey Tracking**: Visualizes emotional trends across the conversation including:
-  - Mood shifts and transitions
-  - Peak positivity and negativity scores
-  - Average sentiment compound score
-  - Intelligent insights about conversation tone
-- 💙 **Empathetic System**: Built with a caring and supportive system prompt for warm interactions
+---
 
-## Prerequisites
+## Implementation Status
 
+### ✅ Tier 1 – Mandatory Requirement: Conversation-Level Sentiment Analysis
+- **Full conversation history** maintained throughout the interaction
+- **Final sentiment analysis** generated at the end of conversation
+- **Overall emotional direction** clearly indicated based on complete exchange
+- Status: **COMPLETE** ✓
+
+### ✅ Tier 2 – Additional Credit: Statement-Level Sentiment Analysis
+- **Individual sentiment evaluation** for every user message
+- **Real-time sentiment display** alongside each message with emoji indicators:
+  - Positive 😊 (compound score ≥ 0.05)
+  - Neutral 😐 (compound score between -0.05 and 0.05)
+  - Negative 😔 (compound score ≤ -0.05)
+- **Mood trend summarization** with intelligent insights about conversation arc
+- **Advanced metrics**: mood swings, peak emotions, average sentiment, mood recovery patterns
+- Status: **COMPLETE** ✓
+
+### 🎁 Bonus Features
+- Empathetic AI responses using Google Gemini with custom system prompt
+- Multi-metric mood tracking (peak joy, peak frustration, consistency analysis)
+- Natural language insights about emotional patterns
+- Production-ready error handling and modular code structure
+- Comprehensive unit tests for sentiment analyzer
+
+---
+
+## How to Run
+
+### 1. Prerequisites
 - Python 3.8+
-- Google Gemini API Key (free tier available)
-- Internet connection (for Gemini API calls)
+- Google Gemini API Key (free at [Google AI Studio](https://aistudio.google.com/app/apikey))
+- Internet connection
 
-## Installation
+### 2. Installation
 
-### 1. Clone or Set Up the Project
-
+**Clone/Set Up the Project:**
 ```bash
-cd LiaPlusAssignment
+cd Chatbot1
 ```
 
-### 2. Create and Activate a Virtual Environment
-
-**Windows (PowerShell):**
+**Create Virtual Environment (Windows PowerShell):**
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-**macOS/Linux:**
+**Create Virtual Environment (macOS/Linux):**
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Install Dependencies
-
+**Install Dependencies:**
 ```bash
 pip install -r requirements.txt
 ```
 
-This installs:
-- `google-generativeai` — Google Gemini API client
-- `vaderSentiment` — Sentiment analysis library
-- `python-dotenv` — Environment variable management
+### 3. Configuration
 
-## Setup
-
-### Get a Gemini API Key
-
+**Get a Gemini API Key:**
 1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Click **"Create API Key"** → **"Create API key in new project"**
-3. Copy the generated API key
+2. Click "Create API Key"
+3. Copy your key
 
-### Configure `.env` File
-
-Create or update `.env` in the project root:
-
+**Create `.env` File:**
 ```env
 GEMINI_API_KEY=your_api_key_here
 ```
 
-Replace `your_api_key_here` with your actual Gemini API key.
+**⚠️ Security:** `.env` is in `.gitignore` — never commit it!
 
-**⚠️ Security Note:** Never commit `.env` to version control. It's already in `.gitignore`.
-
-## Usage
-
-### Run the Chatbot
+### 4. Run the Chatbot
 
 ```bash
 python chatbot.py
 ```
 
-### Interact with the Chatbot
+---
+
+## Example Usage
 
 ```
 Gemini + Emotional Intelligence Chatbot (Updated for 2025)
 Type 'exit', 'quit', or 'bye' to end and see your emotional journey.
 
-You: I'm feeling great today!
-→ Mood: Positive 😊 (+0.798)
+You: Your service disappoints me
+→ Mood: Negative 😔 (-0.627)
 
-Gemini: That's wonderful to hear! I'm so glad you're having such a positive day. 
-What's making you feel this way? I'd love to hear about it!
+Gemini: I'm truly sorry to hear that you're feeling disappointed. Your feedback is valuable
+to us, and I want to help make things right. Can you tell me more about what happened?
 
-You: The weather is beautiful
-→ Mood: Positive 😊 (+0.678)
+You: Last experience was better
+→ Mood: Positive 😊 (+0.518)
 
-Gemini: Yes! Beautiful weather can really lift our spirits and make everything feel brighter...
+Gemini: I'm glad you've had better experiences with us before. Let's work together to bring
+that same level of quality back. What specifically made that experience better?
+
+You: exit
 ```
 
-### Exit the Chatbot
+---
 
-Type any of these to end the conversation:
-- `exit`
-- `quit`
-- `bye`
+## Final Output Example
 
-You'll then see a summary of your emotional journey.
-
-## Output Example
-
-### Final Report
+When you type `exit`, `quit`, or `bye`, you'll see a comprehensive summary:
 
 ```
 ======================================================================
@@ -118,31 +120,91 @@ You'll then see a summary of your emotional journey.
 Final Mood: Positive
 
 Mood Journey: Negative → Positive
-• Mood swings: 2
-• Peak joy: +0.798 | Peak frustration: -0.456
-• Average sentiment: +0.234
+• Mood swings: 1
+• Peak joy: +0.518 | Peak frustration: -0.627
+• Average sentiment: -0.0545
 • Insight: Amazing recovery! Started negative but ended on a high note.
 
-Messages analyzed: 5
+Messages analyzed: 2
 ======================================================================
 Take care! Come back anytime 💙
 ```
+
+---
+
+## Chosen Technologies
+
+| Technology | Purpose | Why Chosen |
+|-----------|---------|-----------|
+| **Python 3.8+** | Core language | Simplicity, readability, industry standard for NLP |
+| **Google Gemini API** | AI responses | Free tier available, state-of-the-art language model |
+| **VADER** | Sentiment analysis | Specialized for social media/conversational text, fast, accurate |
+| **python-dotenv** | Config management | Secure API key handling, environment isolation |
+| **unittest** | Testing | Built-in, no external dependencies, industry standard |
+
+---
+
+## Sentiment Analysis Logic
+
+### VADER (Valence Aware Dictionary and sEntiment Reasoner)
+
+**Why VADER?**
+- Designed for social media and conversational text (perfect for chatbot messages)
+- Lexicon-based: uses a pre-built dictionary of sentiment words with intensities
+- Handles punctuation, capitalization, and context modifiers (e.g., "very good")
+- Fast and lightweight — no neural network overhead
+- Highly interpretable — scores directly represent emotional intensity
+
+**Scoring System:**
+- Returns a compound score ranging from -1.0 (most negative) to +1.0 (most positive)
+- Threshold-based classification:
+  - **Negative**: compound ≤ -0.05
+  - **Neutral**: -0.05 < compound < +0.05
+  - **Positive**: compound ≥ +0.05
+
+**Example Analysis:**
+```python
+Text: "Your service disappoints me"
+Scores: {'neg': 0.469, 'neu': 0.531, 'pos': 0.0, 'compound': -0.627}
+→ Classification: Negative 😔
+
+Text: "That's wonderful!"
+Scores: {'neg': 0.0, 'neu': 0.228, 'pos': 0.772, 'compound': 0.798}
+→ Classification: Positive 😊
+```
+
+### Statement-Level vs. Conversation-Level Analysis
+
+**Statement-Level (Tier 2):**
+- Each user message analyzed independently
+- Real-time sentiment score displayed immediately
+- Captures moment-to-moment emotional shifts
+
+**Conversation-Level (Tier 1):**
+- All user messages combined into full transcript
+- Overall compound score averaged across all statements
+- Provides macro emotional trend and insights
+
+---
 
 ## Project Structure
 
 ```
 Chatbot1/
-├── chatbot.py              # Main chatbot application
+├── chatbot.py              # Main application (GeminiChatbot + SentimentAnalyzer classes)
 ├── test_sentiment.py       # Unit tests for SentimentAnalyzer
 ├── requirements.txt        # Python dependencies
 ├── README.md               # This file
-├── .env                    # Environment variables (not in version control)
-└── .venv/                  # Virtual environment directory
+├── .env                    # API keys (not in version control)
+├── .gitignore              # Git exclusion rules
+└── .venv/                  # Virtual environment
 ```
+
+---
 
 ## Testing
 
-Run the sentiment analyzer tests:
+Run the sentiment analyzer unit tests:
 
 ```bash
 python -m unittest test_sentiment.py -v
@@ -159,114 +221,82 @@ Ran 3 tests in 0.075s
 OK
 ```
 
-## Sentiment Analysis Details
+**Tests Verify:**
+- Positive sentiment correctly identified (e.g., "I love this!" → Positive)
+- Negative sentiment correctly identified (e.g., "This sucks." → Negative)
+- Mood trend tracking across multiple messages
 
-The chatbot uses **VADER (Valence Aware Dictionary and sEntiment Reasoner)** for sentiment analysis:
+---
 
-- **Positive**: Compound score ≥ 0.05 (😊)
-- **Neutral**: Compound score between -0.05 and 0.05 (😐)
-- **Negative**: Compound score ≤ -0.05 (😔)
+## Configuration & Customization
 
-### Mood Tracking Features
+### Change Gemini Model
 
-- **Mood Swings**: Counts transitions between emotional states
-- **Peak Scores**: Tracks the highest positive and lowest negative moments
-- **Average Sentiment**: Computes mean emotional tone across the conversation
-- **Smart Insights**: Generates context-aware summaries of emotional patterns
-
-## Supported Gemini Models
-
-The chatbot uses `gemini-2.5-flash-lite` by default. Other supported models:
-
-- `gemini-2.5-flash` — Faster, good for quick responses
-- `gemini-2.5-pro` — More advanced reasoning
-- `gemini-1.5-pro` — Higher quality, slower
-
-To change the model, edit `chatbot.py`:
-
+Edit `chatbot.py`:
 ```python
-MODEL_NAME = "gemini-2.5-pro"  # Replace with desired model
+MODEL_NAME = "gemini-2.5-pro"  # Options: gemini-2.5-flash, gemini-2.5-pro, gemini-1.5-pro
 ```
 
-Check available models: [Google AI Studio - Models](https://aistudio.google.com/app/apikey)
+### Adjust Response Generation
 
-## Configuration
-
-### Adjust Temperature & Token Limit
-
-Edit `chatbot.py` in the `get_response()` method:
-
+Edit `get_response()` method:
 ```python
 generation_config=genai_types.GenerationConfig(
-    temperature=0.8,      # Range: 0.0–2.0 (higher = more creative)
-    max_output_tokens=600 # Response length limit
+    temperature=0.8,          # 0.0–2.0 (higher = more creative)
+    max_output_tokens=600     # Response length limit
 )
 ```
 
 ### Customize System Prompt
 
-Edit the `GeminiChatbot.__init__()` method:
-
+Edit `GeminiChatbot.__init__()`:
 ```python
 system_instruction="You are a warm, empathetic, and caring support assistant. "
                   "Respond with kindness, patience, and understanding."
 ```
 
+---
+
 ## Troubleshooting
 
-### Error: "GEMINI_API_KEY not found in .env"
-
-**Solution:** Create a `.env` file in the project root and add your API key:
-```env
-GEMINI_API_KEY=your_key_here
-```
-
-### Error: "404 Model not found"
-
-**Solution:** Update `MODEL_NAME` in `chatbot.py` to a valid model:
-```python
-MODEL_NAME = "gemini-2.5-flash"
-```
-
-Visit [Google AI Studio](https://aistudio.google.com/app/apikey) to see available models.
-
-### Error: "Rate limit exceeded"
-
-**Solution:** Wait a few moments before sending the next message, or upgrade your Gemini API plan at [Google AI Studio](https://aistudio.google.com/app/apikey).
-
-### Sentiment Analysis Shows Incorrect Mood
-
-VADER works best with standard English. For improved accuracy:
-- Use clear, standard language
-- Avoid excessive misspellings
-- Contractions are fine (e.g., "I'm happy")
-
-## Dependencies
-
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `google-generativeai` | Latest | Google Gemini API client |
-| `vaderSentiment` | Latest | Sentiment analysis |
-| `python-dotenv` | Latest | Load environment variables |
-
-## License
-
-This project is open-source and available for personal and educational use.
-
-## Contributing
-
-Feel free to fork, modify, and improve this chatbot! Some ideas:
-
-- Add conversation history persistence (save to JSON/SQLite)
-- Implement multi-user support
-- Add custom sentiment dictionaries
-- Integrate with other LLMs (OpenAI, Claude, etc.)
-- Create a web interface (Flask/FastAPI)
-
-## Contact & Support
-
-For issues, questions, or improvements, please open an issue or contact the maintainer.
+| Error | Solution |
+|-------|----------|
+| `GEMINI_API_KEY not found` | Create `.env` with your API key |
+| `404 Model not found` | Update `MODEL_NAME` to valid Gemini model |
+| `Rate limit exceeded` | Wait before next request or upgrade API plan |
+| Incorrect sentiment score | VADER works best with standard English; avoid excessive misspellings |
 
 ---
 
-**Happy chatting! 💙**
+## Dependencies
+
+- **google-generativeai** ≥ 0.8.0 — Gemini API client
+- **vaderSentiment** ≥ 3.3.2 — Sentiment analysis
+- **python-dotenv** ≥ 1.0.0 — Environment variable management
+
+Install all:
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Submission Checklist
+
+- ✅ **Source Code**: `chatbot.py`, `test_sentiment.py`
+- ✅ **README**: Technologies, how to run, sentiment logic, Tier 1 & 2 status
+- ✅ **Tests**: `test_sentiment.py` with 3 passing test cases
+- ✅ **Git Repository**: `.gitignore` configured, clean history
+- ✅ **Tier 1 Implementation**: Conversation-level sentiment + final report
+- ✅ **Tier 2 Implementation**: Statement-level sentiment + mood trends
+- ✅ **Bonus Features**: Empathetic AI, mood metrics, natural insights
+
+---
+
+## License
+
+This project is open-source and available for educational and personal use.
+
+---
+
+**Built with ❤️ | Gemini + VADER + Python**
