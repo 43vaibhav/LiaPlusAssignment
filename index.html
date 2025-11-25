@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Emotional Support Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .chat-bubble { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .typing span { animation: blink 1s infinite; }
+    @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-2xl bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20">
+    <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 text-center">
+      <h1 class="text-3xl font-bold flex items-center justify-center gap-3">
+        LiaPlus AI Assitant
+      </h1>
+      <p class="text-sm mt-2 opacity-90">It will work </p>
+    </div>
+
+    <div id="messages" class="h-96 overflow-y-auto p-6 space-y-4">
+      <div class="text-center text-white/70 text-sm">
+        Start typing below — your feelings are safe with me
+      </div>
+    </div>
+
+    <div class="bg-gray-900/80 p-4 border-t border-white/10">
+      <div class="flex gap-3 max-w-3xl mx-auto">
+        <input
+          id="input"
+          type="text"
+          placeholder="How are you feeling today?"
+          class="flex-1 bg-white/10 text-white placeholder-white/50 rounded-full px-6 py-3 outline-none focus:ring-4 focus:ring-purple-500 transition"
+          autocomplete="off"
+        />
+        <button id="send" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full w-12 h-12 hover:scale-110 transition shadow-lg">
+          Send
+        </button>
+      </div>
+      <p class="text-center text-xs text-white/50 mt-2">Press Enter to send</p>
+    </div>
+  </div>
+
+  <script>
+    const messages = document.getElementById("messages");
+    const input = document.getElementById("input");
+    const send = document.getElementById("send");
+
+    const addMessage = (text, sender = "user", sentiment = null, score = null) => {
+      const div = document.createElement("div");
+      div.className = `chat-bubble flex ${sender === "user" ? "justify-end" : "justify-start"}`;
+
+      const bg = sender === "user"
+        ? (sentiment === "Positive" ? "bg-green-500" : sentiment === "Negative" ? "bg-red-500" : "bg-gray-500")
+        : "bg-white/20 backdrop-blur";
+
+      const sentimentText = sentiment ? `${sentiment} ${sentiment === "Positive" ? "positive" : sentiment === "Negative" ? "negative" : "neutral"} (${score > 0 ? "+" : ""}${score})` : "";
+
+      div.innerHTML = `
+        <div class="max-w-xs lg:max-w-md px-5 py-3 rounded-3xl ${bg} text-white shadow-lg">
+          <p>${text.replace(/\n/g, "<br>")}</p>
+          ${sender === "user" && sentiment ? `<div class="text-xs mt-2 opacity-80 text-right">${sentimentText}</div>` : ""}
+        </div>
+      `;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    };
+
+    const showTyping = () => {
+      const typing = document.createElement("div");
+      typing.id = "typing";
+      typing.className = "flex justify-start chat-bubble";
+      typing.innerHTML = `<div class="bg-white/20 backdrop-blur px-5 py-3 rounded-3xl text-white/70 typing">
+        <span>.</span><span>.</span><span>.</span>
+      </div>`;
+      messages.appendChild(typing);
+      messages.scrollTop = messages.scrollHeight;
+    };
+
+    const sendMessage = async () => {
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage(text, "user");
+      input.value = "";
+      showTyping();
+
+      try {
+        const response = await fetch("http://127.0.0.1:8000/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: text })   // ← This matches your FastAPI model
+        });
+
+        document.getElementById("typing")?.remove();
+
+        if (!response.ok) throw new Error("Network error");
+
+        const data = await response.json();
+
+        // Re-add user message with sentiment
+        if (!data.end) {
+          const lastMsg = [...messages.querySelectorAll(".chat-bubble")].pop();
+          if (lastMsg) lastMsg.remove();
+          addMessage(text, "user", data.sentiment, data.score);
+        }
+
+        addMessage(data.reply, "bot");
+
+        if (data.end) {
+          setTimeout(() => {
+            const report = document.createElement("div");
+            report.className = "bg-gradient-to-r from-purple-800 to-pink-800 text-white p-6 rounded-2xl text-center shadow-2xl mx-8 my-6";
+            report.innerHTML = `
+              <h3 class="text-2xl font-bold mb-4">Your Emotional Journey</h3>
+              <pre class="text-left text-sm font-mono whitespace-pre-wrap leading-relaxed">${data.final_report}</pre>
+            `;
+            messages.appendChild(report);
+          }, 600);
+        }
+
+      } catch (err) {
+        document.getElementById("typing")?.remove();
+        addMessage("Sorry, I can't connect. Is the server running?", "bot");
+      }
+    };
+
+    send.onclick = sendMessage;
+    input.addEventListener("keypress", e => e.key === "Enter" && sendMessage());
+  </script>
+</body>
+</html>

@@ -1,9 +1,21 @@
-# chatbot.py
+# chatbot.py — VADER + Gemini + FastAPI (Works with your own index.html)
 import os
 import sys
 from dotenv import load_dotenv
 import google.generativeai as genai
-import google.generativeai.types as genai_types  # Explicit import for config
+import google.generativeai.types as genai_types
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import uvicorn
+
+# === VADER ===
+try:
+    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+except ImportError:
+    print("Run: pip install vaderSentiment")
+    sys.exit(1)
 
 load_dotenv()
 
@@ -15,18 +27,9 @@ if not GEMINI_API_KEY:
     sys.exit(1)
 
 genai.configure(api_key=GEMINI_API_KEY)
+MODEL_NAME = "gemini-2.5-flash-lite"  # Confirmed working in 2025
 
-# UPDATED: Use the current stable model (2025 standard)
-MODEL_NAME = "gemini-2.5-flash-lite"  # Fast, stable, and supported
-
-# === VADER ===
-try:
-    from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-except ImportError:
-    print("Run: pip install vaderSentiment")
-    sys.exit(1)
-
-
+# === VADER Sentiment Analyzer ===
 class SentimentAnalyzer:
     def __init__(self):
         self.analyzer = SentimentIntensityAnalyzer()
@@ -45,56 +48,43 @@ class SentimentAnalyzer:
 
         scores = self.user_scores
         labels = ['Positive' if s >= 0.05 else 'Negative' if s <= -0.05 else 'Neutral' for s in scores]
-        shifts = [(i, labels[i-1], labels[i]) for i in range(1, len(labels)) if labels[i] != labels[i-1]]
+        shifts = sum(1 for i in range(1, len(labels)) if labels[i] != labels[i-1])
 
-        start = labels[0]
-        end = labels[-1]
+        start, end = labels[0], labels[-1]
         avg = round(sum(scores) / len(scores), 3)
         peak_pos = max(scores)
         peak_neg = min(scores)
-        swings = len(shifts)
 
-        # Natural language insight
-        if swings == 0:
-            insight = f"Very stable mood — stayed consistently {start.lower()}."
-        elif end == "Positive" and start == "Negative":
-            insight = "Amazing recovery! Started negative but ended on a high note."
-        elif end == "Negative" and start == "Positive":
-            insight = "The mood deteriorated over time — ended feeling down."
-        elif swings >= 3:
-            insight = f"Quite emotional with {swings} mood swings."
-        else:
-            insight = f"Some ups and downs, but ended {end.lower()}."
+        insight = (
+            "Amazing recovery! Started negative but ended on a high note." if end == "Positive" and start == "Negative" else
+            "The mood went down — I'm here for you." if end == "Negative" and start == "Positive" else
+            f"Very emotional with {shifts} mood swings." if shifts >= 3 else
+            f"Stable and {start.lower()} throughout." if shifts == 0 else
+            f"Ended feeling {end.lower()}."
+        )
 
-        trend = f"{start} → {end}" if start != end else start
+        trend = f"{start} to {end}" if start != end else start
 
         return (
             f"Mood Journey: {trend}\n"
-            f"• Mood swings: {swings}\n"
-            f"• Peak joy: {peak_pos:+.3f} | Peak frustration: {peak_neg:+.3f}\n"
-            f"• Average sentiment: {avg:+.3f}\n"
+            f"• Mood swings: {shifts}\n"
+            f"• Peak joy: {peak_pos:+.3f} | Peak low: {peak_neg:+.3f}\n"
+            f"• Average: {avg:+.3f}\n"
             f"• Insight: {insight}"
         )
 
-
+# === Gemini Chatbot ===
 class GeminiChatbot:
     def __init__(self):
-        try:
-            self.model = genai.GenerativeModel(
-                model_name=MODEL_NAME,
-                system_instruction="You are a warm, empathetic, and caring support assistant. "
-                                  "Respond with kindness, patience, and understanding."
-            )
-        except Exception as e:
-            print(f"Model init error: {e}")
-            print("Try updating to: MODEL_NAME = 'gemini-2.5-pro' in the code.")
-            sys.exit(1)
-        
-        # Start a proper chat session
+        self.model = genai.GenerativeModel(
+            model_name=MODEL_NAME,
+            system_instruction="You are a warm, empathetic, and caring support assistant. "
+                              "Respond with kindness, patience, and understanding."
+        )
         self.chat_session = self.model.start_chat(history=[])
         self.sentiment = SentimentAnalyzer()
 
-    def get_response(self, user_input):
+    def get_response(self, user_input: str) -> str:
         try:
             response = self.chat_session.send_message(
                 user_input,
@@ -107,41 +97,52 @@ class GeminiChatbot:
         except Exception as e:
             return f"[Gemini Error: {str(e)}]"
 
-    def chat(self):
-        print("Gemini + Emotional Intelligence Chatbot (Updated for 2025)")
-        print("Type 'exit', 'quit', or 'bye' to end and see your emotional journey.\n")
+# === FastAPI App ===
+app = FastAPI(title="VADER + Gemini Chatbot")
 
-        while True:
-            msg = input("You: ").strip()
-            if msg.lower() in ["exit", "quit", "bye"]:
-                break
-            if not msg:
-                continue
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],           # Allows your index.html to connect
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-            # Analyze sentiment
-            label, conf = self.sentiment.analyze(msg)
-            emoji = {"Positive": "😊", "Negative": "😔", "Neutral": "😐"}[label]
-            print(f"→ Mood: {label} {emoji} ({conf:+.3f})\n")
+# Shared chatbot instance
+chatbot = GeminiChatbot()
 
-            # Get reply from Gemini
-            reply = self.get_response(msg)
-            print(f"Gemini: {reply}\n")
+class Message(BaseModel):
+    text: str
 
-        # === FINAL REPORT ===
-        print("\n" + "═" * 70)
-        print("          YOUR EMOTIONAL JOURNEY SUMMARY")
-        print("═" * 70)
-        if self.sentiment.user_scores:
-            final_score = self.sentiment.user_scores[-1]
-            final_mood = 'Positive' if final_score >= 0.05 else 'Negative' if final_score <= -0.05 else 'Neutral'
-            print(f"Final Mood: {final_mood}\n")
-            print(self.sentiment.get_enhanced_trend_summary())
-            print(f"\nMessages analyzed: {len(self.sentiment.user_scores)}")
-        else:
-            print("No messages sent.")
-        print("═" * 70)
-        print("Take care! Come back anytime 💙\n")
+@app.post("/chat")
+async def chat_endpoint(msg: Message):
+    text = msg.text.strip()
 
+    if text.lower() in ["exit", "quit", "bye", "goodbye"]:
+        report = chatbot.sentiment.get_enhanced_trend_summary()
+        final_score = chatbot.sentiment.user_scores[-1] if chatbot.sentiment.user_scores else 0
+        final_mood = 'Positive' if final_score >= 0.05 else 'Negative' if final_score <= -0.05 else 'Neutral'
+        
+        return {
+            "reply": "Thank you for chatting with me today. Take care!",
+            "sentiment": final_mood,
+            "score": round(final_score, 3),
+            "final_report": report,
+            "end": True
+        }
 
-if __name__ == '__main__':
-    GeminiChatbot().chat()
+    # Normal message
+    label, score = chatbot.sentiment.analyze(text)
+    reply = chatbot.get_response(text)
+
+    return {
+        "reply": reply,
+        "sentiment": label,
+        "score": score,
+        "end": False
+    }
+
+if __name__ == "__main__":
+    print("VADER + Gemini Chatbot Server Running")
+    print("Open your index.html file → it will connect automatically!")
+    uvicorn.run(app, host="127.0.0.1", port=8000)
