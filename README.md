@@ -1,6 +1,6 @@
 # Emotional Intelligence Chatbot
 
-**Assignment:** Conversational AI with Sentiment Analysis (Tier 1 & Tier 2 Implementation)
+Conversational AI with Sentiment Analysis (Tier 1 & Tier 2 Implementation)
 
 A production-grade Python chatbot that maintains full conversation history, performs real-time sentiment analysis on individual user messages, and generates comprehensive emotional journey summaries. Built with **Google Gemini** for intelligent responses and **VADER** for accurate sentiment evaluation. This version adds a small web UI and a FastAPI HTTP endpoint so the bot can be used from a browser or programmatically.
 
@@ -327,6 +327,7 @@ pip install -r requirements.txt
 This project is open-source and available for educational and personal use.
 
 ---
+
 
 
 
